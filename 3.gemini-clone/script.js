@@ -2,6 +2,10 @@ const typingForm = document.querySelector(".typing-form");
 const chatList = document.querySelector(".chat-list");
 
 let userMessage = null;
+//API configuration 
+const API_KEY ='AIzaSyC5S19quXGIGspTTl0o4_yZm8NxC3iYwrg';
+const API_URL =`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=$
+{API_KEY}`;
 
 //create a new message element and return it
 const createMessageElement = (content, ...classes) => {
@@ -10,6 +14,24 @@ const createMessageElement = (content, ...classes) => {
   div.innerHTML = content;
   return div;
 };
+//fetch response form the API based on user message
+const generateAPIresponse = async () => {
+  //send a POST request to the API with user's message
+  try {
+    const response = await fetch(API_URL,{
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents:[{
+            role: "user",
+            parts: [{ text: userMessage }]
+        }]
+      })
+    });
+  }catch(error) {
+    console.log(error);
+  }
+}
 
 // show loading Animation while api response
 const showLoadingAnimation = () => {
@@ -26,6 +48,8 @@ const showLoadingAnimation = () => {
 
   const incomingMessageDiv = createMessageElement(html, "incoming", "loading");
   chatList.appendChild(incomingMessageDiv);
+
+  generateAPIresponse();
 };
 
 // handle sending outgoing messages
