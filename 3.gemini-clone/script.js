@@ -1,11 +1,10 @@
+import API_KEY from './configure.js';
 const typingForm = document.querySelector(".typing-form");
 const chatList = document.querySelector(".chat-list");
 
 let userMessage = null;
 //API configuration 
-const API_KEY ='AIzaSyC5S19quXGIGspTTl0o4_yZm8NxC3iYwrg';
-const API_URL =`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=$
-{API_KEY}`;
+const API_URL =`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
 
 //create a new message element and return it
 const createMessageElement = (content, ...classes) => {
@@ -14,8 +13,27 @@ const createMessageElement = (content, ...classes) => {
   div.innerHTML = content;
   return div;
 };
+
+//show typing Interval effect by words one by one
+const showTypingEffect = (text,textElement) => {
+  const words = text.split(' ');
+  let currentWordIndex = 0;
+
+  const typingInterval = setInterval( () => {
+    //append each word to the text element with a space
+    textElement.innerText += (currentWordIndex === 0 ? '' : ' ') + words[currentWordIndex++]
+  
+    //If all words are displayed
+    if(currentWordIndex === words.length) {
+      clearInterval(typingInterval);
+    }
+
+  },75);
+}
 //fetch response form the API based on user message
-const generateAPIresponse = async () => {
+const generateAPIresponse = async (incomingMessageDiv) => {
+    const textElement = incomingMessageDiv.querySelector(".text"); // get tex element
+
   //send a POST request to the API with user's message
   try {
     const response = await fetch(API_URL,{
@@ -28,8 +46,18 @@ const generateAPIresponse = async () => {
         }]
       })
     });
+
+    const  data  = await response.json();
+    
+    //get api response text only
+    const apiResponse = data?.candidates[0].content.parts[0].text;
+    // textElement.innerHTML = apiResponse;
+    // console.log(apiResponse);
+    showTypingEffect(apiResponse, textElement);
   }catch(error) {
     console.log(error);
+  }finally {
+    incomingMessageDiv.classList.remove("loading");
   }
 }
 
@@ -43,14 +71,24 @@ const showLoadingAnimation = () => {
                   <div class="loading-bar"></div>
                   <div class="loading-bar"></div>
                 </div>
+                <span onclick="copyMessage(this)" class="icon material-symbols-outlined">content_copy</span>
+                <span class="icon material-symbols-outlined">content_copy</span>
             </div>
-            <span class="icon material-symbols-outlined">content_copy</span>`;
+            `;
 
   const incomingMessageDiv = createMessageElement(html, "incoming", "loading");
   chatList.appendChild(incomingMessageDiv);
 
-  generateAPIresponse();
+  generateAPIresponse(incomingMessageDiv);
 };
+
+// copy message 
+const copyMessage = (copyIcon) => {
+  const messageText = copyIcon.parentElement.querySelector(".text");
+  navigator.clipboard.writeText(messageText);
+  copyIcon.innerHTML = "done" //show tick icon
+  setTimeout(() => copyIcon.innerHTML = "content_copy",1000) //revet icon after 1 sec
+}
 
 // handle sending outgoing messages
 const handleOutgoingchat = () => {
