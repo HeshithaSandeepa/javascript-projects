@@ -1,6 +1,7 @@
 import API_KEY from './configure.js';
 const typingForm = document.querySelector(".typing-form");
 const chatList = document.querySelector(".chat-list");
+const toggleThemeButton = document.querySelector("#toggle-theme-button");
 
 let userMessage = null;
 //API configuration 
@@ -61,6 +62,20 @@ const generateAPIresponse = async (incomingMessageDiv) => {
   }
 }
 
+// copy message 
+const copyMessage = (copyIcon) => {
+  const messageText = copyIcon.parentElement.querySelector(".text").innerText;
+  navigator.clipboard.writeText(messageText);
+  copyIcon.innerHTML = "done" //show tick icon
+  setTimeout(() => copyIcon.innerHTML = "content_copy",1000) //revet icon after 1 sec
+};
+
+//light_mode dark mode 
+toggleThemeButton.addEventListener("click", () => {
+  const isLightMode = document.body.classList.toggle("light_mode");
+  toggleThemeButton.innerText = isLightMode ? "dark_mode" : "light_mode"; // change icon dark mode light mode 
+})
+
 // show loading Animation while api response
 const showLoadingAnimation = () => {
   const html = ` <div class="message-content">
@@ -82,13 +97,7 @@ const showLoadingAnimation = () => {
   generateAPIresponse(incomingMessageDiv);
 };
 
-// copy message 
-const copyMessage = (copyIcon) => {
-  const messageText = copyIcon.parentElement.querySelector(".text");
-  navigator.clipboard.writeText(messageText);
-  copyIcon.innerHTML = "done" //show tick icon
-  setTimeout(() => copyIcon.innerHTML = "content_copy",1000) //revet icon after 1 sec
-}
+
 
 // handle sending outgoing messages
 const handleOutgoingchat = () => {

@@ -16,6 +16,19 @@
   --secondary-color:#313030;
   --secondary-hover-color:#3e3e3f;
 }
+
+.light_mode{
+  /* light mode colors */
+  --text-color: #222;
+  --subheading-color: #A0A0A0;
+  --placeholder-color: #6C6C6C;
+  --primary-color: #fff;
+  --secondary-color:#E9EEF6;
+  --secondary-hover-color:#DBE1EA;
+}
+
+
+
 body {
   background: var(--primary-color);
 }
