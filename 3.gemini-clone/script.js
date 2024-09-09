@@ -7,6 +7,18 @@ let userMessage = null;
 //API configuration 
 const API_URL =`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
 
+const loadLocalstorageData = () => {
+  const savedChats = localStorage.getItem("savedChats");
+  const isLightMode = (localStorage.getItem("themeColor") === "light_mode");
+
+  document.body.classList.toggle("light_mode", isLightMode);
+  toggleThemeButton.innerText = isLightMode ? "dark_mode" : "light_mode";
+
+  chatList.innerHTML = savedChats || "";
+}
+
+loadLocalstorageData();
+
 //create a new message element and return it
 const createMessageElement = (content, ...classes) => {
   const div = document.createElement("div");
@@ -27,6 +39,7 @@ const showTypingEffect = (text,textElement) => {
     //If all words are displayed
     if(currentWordIndex === words.length) {
       clearInterval(typingInterval);
+      localStorage.setItem("savedChats",chatList.innerHTML); //chat list saved in local storage
     }
 
   },75);
@@ -73,6 +86,7 @@ const copyMessage = (copyIcon) => {
 //light_mode dark mode 
 toggleThemeButton.addEventListener("click", () => {
   const isLightMode = document.body.classList.toggle("light_mode");
+  localStorage.setItem("themeColor",isLightMode ? "light_mode" : "dark_mode" );
   toggleThemeButton.innerText = isLightMode ? "dark_mode" : "light_mode"; // change icon dark mode light mode 
 })
 
