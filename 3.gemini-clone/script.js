@@ -3,9 +3,11 @@ const typingForm = document.querySelector(".typing-form");
 const chatList = document.querySelector(".chat-list");
 const toggleThemeButton = document.querySelector("#toggle-theme-button");
 const deleteChatButton = document.querySelector("#delete-chat-button");
+const suggestions = document.querySelectorAll(".suggestion-list .suggestion");
 
 
 let userMessage = null;
+let isResponseGenerating = false;
 //API configuration 
 const API_URL =`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
 
@@ -44,6 +46,7 @@ const showTypingEffect = (text,textElement, incomingMessageDiv) => {
     //If all words are displayed
     if(currentWordIndex === words.length) {
       clearInterval(typingInterval);
+      isResponseGenerating = false ;
       incomingMessageDiv.querySelector(".icon").classList.remove("hide");
       localStorage.setItem("savedChats",chatList.innerHTML); //chat list saved in local storage
      
@@ -77,6 +80,7 @@ const generateAPIresponse = async (incomingMessageDiv) => {
     // console.log(apiResponse);
     showTypingEffect(apiResponse, textElement,incomingMessageDiv);
   }catch(error) {
+    isResponseGenerating = false;
     console.log(error);
   }finally {
     incomingMessageDiv.classList.remove("loading");
@@ -124,8 +128,10 @@ const showLoadingAnimation = () => {
 
 // handle sending outgoing messages
 const handleOutgoingchat = () => {
-  userMessage = typingForm.querySelector(".typing-input").value.trim();
-  if (!userMessage) return; //exit if there is no message
+  userMessage = typingForm.querySelector(".typing-input").value.trim() || userMessage;
+  if (!userMessage || isResponseGenerating) return; //exit if there is no message
+
+  isResponseGenerating = true;
 
   // console.log(userMessage);
   const html = ` <div class="message-content">
@@ -142,6 +148,16 @@ const handleOutgoingchat = () => {
   document.body.classList.add("hide-header");//hide the header once start chat
   setTimeout(showLoadingAnimation, 500); // show loading animation after a dely
 };
+
+// set user message and handle outgoing chat when  a suggestion is clicked
+suggestions.forEach( suggestion => {
+  suggestion.addEventListener("click", () => {
+    userMessage = suggestion.querySelector(".text").innerText;
+    handleOutgoingchat();
+  });
+});
+
+
 
 //delete chat  form local storage when button is clicked
 deleteChatButton.addEventListener("click", () => {
