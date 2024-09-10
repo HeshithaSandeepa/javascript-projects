@@ -2,6 +2,8 @@ import API_KEY from './configure.js';
 const typingForm = document.querySelector(".typing-form");
 const chatList = document.querySelector(".chat-list");
 const toggleThemeButton = document.querySelector("#toggle-theme-button");
+const deleteChatButton = document.querySelector("#delete-chat-button");
+
 
 let userMessage = null;
 //API configuration 
@@ -16,6 +18,7 @@ const loadLocalstorageData = () => {
 
   chatList.innerHTML = savedChats || "";
   chatList.scrollTo(0, chatList.scrollHeight); //scroll to bottom
+  document.body.classList.toggle(".hide-header", savedChats);
 }
 
 loadLocalstorageData();
@@ -136,8 +139,17 @@ const handleOutgoingchat = () => {
 
   typingForm.reset(); // clear input field
   chatList.scrollTo(0, chatList.scrollHeight); //scroll to bottom
+  document.body.classList.add("hide-header");//hide the header once start chat
   setTimeout(showLoadingAnimation, 500); // show loading animation after a dely
 };
+
+//delete chat  form local storage when button is clicked
+deleteChatButton.addEventListener("click", () => {
+  if(confirm("are you sure you want to delete all messages?")) {
+    localStorage.removeItem("savedChats");
+    loadLocalstorageData();
+  }
+});
 
 // prevent default form submission and handle outgoing chat
 typingForm.addEventListener("submit", (e) => {
