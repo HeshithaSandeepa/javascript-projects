@@ -49,7 +49,6 @@ const showTypingEffect = (text,textElement, incomingMessageDiv) => {
       isResponseGenerating = false ;
       incomingMessageDiv.querySelector(".icon").classList.remove("hide");
       localStorage.setItem("savedChats",chatList.innerHTML); //chat list saved in local storage
-     
 
     }
     chatList.scrollTo(0, chatList.scrollHeight); //auto scroll bottom
@@ -73,6 +72,9 @@ const generateAPIresponse = async (incomingMessageDiv) => {
     });
 
     const  data  = await response.json();
+    if(!response.ok) throw new Error(data.error.message);
+
+
     
     //get api response text only remove asteriks form it
     const apiResponse = data?.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, '$1');
@@ -81,7 +83,9 @@ const generateAPIresponse = async (incomingMessageDiv) => {
     showTypingEffect(apiResponse, textElement,incomingMessageDiv);
   }catch(error) {
     isResponseGenerating = false;
-    console.log(error);
+    textElement.innerText =error.message;
+    textElement.classList.add("error");
+    // console.log(error);
   }finally {
     incomingMessageDiv.classList.remove("loading");
   }
