@@ -15,6 +15,7 @@ const loadLocalstorageData = () => {
   toggleThemeButton.innerText = isLightMode ? "dark_mode" : "light_mode";
 
   chatList.innerHTML = savedChats || "";
+  chatList.scrollTo(0, chatList.scrollHeight); //scroll to bottom
 }
 
 loadLocalstorageData();
@@ -28,20 +29,24 @@ const createMessageElement = (content, ...classes) => {
 };
 
 //show typing Interval effect by words one by one
-const showTypingEffect = (text,textElement) => {
+const showTypingEffect = (text,textElement, incomingMessageDiv) => {
   const words = text.split(' ');
   let currentWordIndex = 0;
 
   const typingInterval = setInterval( () => {
     //append each word to the text element with a space
     textElement.innerText += (currentWordIndex === 0 ? '' : ' ') + words[currentWordIndex++]
+    incomingMessageDiv.querySelector(".icon").classList.add("hide");
   
     //If all words are displayed
     if(currentWordIndex === words.length) {
       clearInterval(typingInterval);
+      incomingMessageDiv.querySelector(".icon").classList.remove("hide");
       localStorage.setItem("savedChats",chatList.innerHTML); //chat list saved in local storage
-    }
+     
 
+    }
+    chatList.scrollTo(0, chatList.scrollHeight); //auto scroll bottom
   },75);
 }
 //fetch response form the API based on user message
@@ -63,11 +68,11 @@ const generateAPIresponse = async (incomingMessageDiv) => {
 
     const  data  = await response.json();
     
-    //get api response text only
-    const apiResponse = data?.candidates[0].content.parts[0].text;
+    //get api response text only remove asteriks form it
+    const apiResponse = data?.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, '$1');
     // textElement.innerHTML = apiResponse;
     // console.log(apiResponse);
-    showTypingEffect(apiResponse, textElement);
+    showTypingEffect(apiResponse, textElement,incomingMessageDiv);
   }catch(error) {
     console.log(error);
   }finally {
@@ -108,6 +113,7 @@ const showLoadingAnimation = () => {
   const incomingMessageDiv = createMessageElement(html, "incoming", "loading");
   chatList.appendChild(incomingMessageDiv);
 
+  chatList.scrollTo(0, chatList.scrollHeight); //scroll to bottom
   generateAPIresponse(incomingMessageDiv);
 };
 
@@ -129,6 +135,7 @@ const handleOutgoingchat = () => {
   chatList.appendChild(outgoingMessageDiv);
 
   typingForm.reset(); // clear input field
+  chatList.scrollTo(0, chatList.scrollHeight); //scroll to bottom
   setTimeout(showLoadingAnimation, 500); // show loading animation after a dely
 };
 
