@@ -25,8 +25,6 @@
 <h2><ul><li>Intersection Observer Js API</li></ul>
 <p>This is animation when scroll down website section by section u can see animations</p>
 <p>tou can see these animation when scroll down section Want to talk and Testimonials</p>
-
-
 <br>
 <img src=""/></a></a>
 </h2>
