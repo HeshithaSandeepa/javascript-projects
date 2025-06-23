@@ -21,6 +21,8 @@ const observer = new IntersectionObserver((entries) => {
     if (intersecting) {
       entry.target.classList.add('opacityOn');
       entry.target.classList.add('blendin');
+      observer.unobserve(entry.target);
+
     }
     else {
       entry.target.classList.remove('opacityOn');
